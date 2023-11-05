@@ -1,8 +1,9 @@
-from weapon import Weapon
+from weapon.weapon import Weapon, AntiAirMissile, Lance_torpilles, Lance_missiles_antisurface
+from math import sqrt
 
 
 class Vessel:
-    def __init__(self, coordinates: tuple, max_hits: int, weapon: Weapon):
+    def __init__(self, coordinates: tuple, max_hits: int, weapon):
         self.coordinates = coordinates
         self.max_hits = max_hits
         self.weapon = weapon
@@ -12,66 +13,66 @@ class Vessel:
         self.coordinates = (x, y, z)
 
     def get_coordinates(self, x: int, y: int, z: int):
-        return (self.coordinates)
+        return self.coordinates
 
     def is_valid_target(self, x, y, z):
         pass
 
     def fire_at(self, x, y, z):
         if self.max_hits == 0:
-            return ("Vessel is destroyed")
-        elif self.weapon.ammunitions == 0:
-            return ("No more ammunitions")
+            return "Vessel is destroyed"
+        elif self.weapon.munitions == 0:
+            return "No more munitions"
         elif self.calculate_distance > self.weapon.range or not self.is_valid_target(x, y, z):
-            self.weapon.ammunitions -= 1
-            return ("Loin de vision or not valid target ")
+            self.weapon.munitions -= 1
+            return "Loin de vision or not valid target "
         else:
             pass
 
     def calculate_distance(self, x, y, z):
         x1, y1, z1 = self.coordinates
-        return (sqrt((x - x1) ** 2 + (y - y1) ** 2 + (z - z1) ** 2))
+        return sqrt((x - x1) ** 2 + (y - y1) ** 2 + (z - z1) ** 2)
 
 
 class Cruiser(Vessel):
     def __init__(self, coordinates):
-        weapon = AntiAirMissile()
-        super().__init__(coordinates, max_hits=6, weapon=weapon)
+        weapon = AntiAirMissile
+        super().__init__(coordinates, max_hits = 6, weapon = weapon)
 
     def go_to(self, x, y, z):
         if not self.is_valid_move(x, y, z):
-            return ("mouvement invalide")
+            return "movement invalid"
         self.coordinates = (x, y, z)
 
     def is_valid_move(self, x, y, z):
-        return (z == 0)
+        return z == 0
 
     def is_valid_target(self, x, y, z):
         return self.z > 0
 
     def fire_at(self, x, y, z):
         if self.max_hits == 0:
-            return ("Vessel is destroyed")
-        elif self.weapon.ammunitions == 0:
-            return ("No more ammunitions")
+            return "Vessel is destroyed"
+        elif self.weapon.munitions == 0:
+            return "No more munitions"
         elif self.calculate_distance > self.weapon.range or not self.is_valid_target(x, y, z):
-            self.weapon.ammunitions -= 1
-            return ("Loin de vision or not valid target ")
+            self.weapon.munitions -= 1
+            return "Loin de vision or not valid target "
         else:
             pass  # on doit diminuer de max_hits de vessel attaqué
 
 
 class Submarine(Vessel):
     def __init__(self, coordinates):
-        weapon = Lance_torpilles()
-        super().__init__(coordinates, max_hits=2, weapon=weapon)
+        weapon = Lance_torpilles
+        super().__init__(coordinates, max_hits = 2, weapon = weapon)
 
     def is_valid_move(self, x, y, z):
         return z == 0 or z == -1
 
     def go_to(self, x, y, z):
         if not self.is_valid_move(x, y, z):
-            return ("mouvement invalide")
+            return "movement invalid"
         self.coordinates = (x, y, z)
 
     def is_valid_target(self, x, y, z):
@@ -79,70 +80,95 @@ class Submarine(Vessel):
 
     def fire_at(self, x, y, z):
         if self.max_hits == 0:
-            return ("Vessel is destroyed")
-        elif self.weapon.ammunitions == 0:
-            return ("No more ammunitions")
+            return "Vessel is destroyed"
+        elif self.weapon.munitions == 0:
+            return "No more munitions"
         elif self.calculate_distance > self.weapon.range or not self.is_valid_target(x, y, z):
-            self.weapon.ammunitions -= 1
-            return ("Loin de vision or not valid target ")
+            self.weapon.munitions -= 1
+            return "Loin de vision or not valid target "
         else:
             pass
         # on doit diminuer de max_hits de vessel attaqué
 
 
-class Fregate(Vessel):
-    def __init__(self, coordinates):
-        weapon = Lance_missiles_antisurface()
-        super().__init__(coordinates, max_hits=5, weapon=weapon)
+class OutOfRangeError(Exception):
+    pass
 
-    def is_valid_move(self, x, y, z):
-        return z == 0
+
+class DestroyedError(Exception):
+    pass
+
+
+class Frigate(Vessel):
+    def __init__(self, coordinates):
+        super().__init__(coordinates, max_hits = 5, weapon = Lance_missiles_antisurface)
 
     def go_to(self, x, y, z):
-        if not self.is_valid_move(x, y, z):
-            return ("mouvement invalide")
-        self.coordinates = (x, y, z)
-
-    def is_valid_target(self, x, y, z):
-        self.z <= 0
+        if z == 0:
+            self.coordinates = (x, y, z)
+        else:
+            print("Invalid coordinates")
 
     def fire_at(self, x, y, z):
         if self.max_hits == 0:
-            return ("Vessel is destroyed")
-        elif self.weapon.ammunitions == 0:
-            return ("No more ammunitions")
-        elif self.calculate_distance > self.weapon.range or not self.is_valid_target(x, y, z):
-            self.weapon.ammunitions -= 1
-            return ("Loin de vision or not valid target ")
+            raise DestroyedError("The Vessel is destroyed and cannot fire")
+
+        if self.calculate_distance(x, y, z) > self.weapon.range:
+            raise OutOfRangeError("The target is out of range")
+
+        if self.weapon.munition > 0:
+            self.weapon.munition -= 1
+            self.max_hits -= 1
+            print(f"Successful shot at the target at position ({x}, {y}, {z})")
         else:
-            pass
+            print("No munitions.")
 
 
 class Destroyer(Vessel):
     def __init__(self, coordinates):
-        weapon = Lance_torpilles()
-        super().__init__(coordinates, max_hits=4, weapon=weapon)
-
-    def is_valid_move(self, x, y, z):
-        return z == 0
+        super().__init__(coordinates, max_hits = 4, weapon = Lance_torpilles)
 
     def go_to(self, x, y, z):
-        if not self.is_valid_move(x, y, z):
-            return ("mouvement invalide")
-        self.coordinates = (x, y, z)
-
-    def is_valid_target(self, x, y, z):
-        self.z <= 0
+        if z == 0:
+            self.coordinates = (x, y, z)
+        else:
+            print("Invalid coordinates")
 
     def fire_at(self, x, y, z):
         if self.max_hits == 0:
-            return ("Vessel is destroyed")
-        elif self.weapon.ammunitions == 0:
-            return ("No more ammunitions")
-        elif self.calculate_distance > self.weapon.range or not self.is_valid_target(x, y, z):
-            self.weapon.ammunitions -= 1
-            return ("Loin de vision or not valid target ")
+            raise DestroyedError("The Vessel is destroyed and cannot fire")
+
+        if self.calculate_distance(x, y, z) > self.weapon.range:
+            raise OutOfRangeError("The target is out of range")
+
+        if self.weapon.munition > 0:
+            self.weapon.munition -= 1
+            self.max_hits -= 1
+            print(f"Successful shot at the target at position ({x}, {y}, {z})")
         else:
-            pass
-# o	Missile anti-air : z > 0
-# o	Torpille : z <= 0
+            print("No munitions.")
+
+
+class Aircraft(Vessel):
+    def __init__(self, coordinates):
+        super().__init__(coordinates, max_hits = 1, weapon = Lance_missiles_antisurface)
+
+    def go_to(self, x, y, z):
+        if z == 1:
+            self.coordinates = (x, y, z)
+        else:
+            print("Invalid coordinates")
+
+    def fire_at(self, x, y, z):
+        if self.max_hits == 0:
+            raise DestroyedError("The Vessel is destroyed and cannot fire")
+
+        if self.calculate_distance(x, y, z) > self.weapon.range:
+            raise OutOfRangeError("The target is out of range")
+
+        if self.weapon.munition > 0:
+            self.weapon.munition -= 1
+            self.max_hits -= 1
+            print(f"Successful shot at the target at position ({x}, {y}, {z})")
+        else:
+            print("No munitions.")
