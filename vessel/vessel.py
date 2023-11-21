@@ -3,7 +3,7 @@ from math import sqrt
 
 
 class Vessel:
-    def __init__(self, coordinates: tuple, max_hits: int, weapon):
+    def __init__(self, coordinates: tuple, max_hits: int, weapon: Weapon):
         self.coordinates = coordinates
         self.max_hits = max_hits
         self.weapon = weapon
@@ -12,7 +12,7 @@ class Vessel:
     def go_to(self, x, y, z):
         self.coordinates = (x, y, z)
 
-    def get_coordinates(self, x: int, y: int, z: int):
+    def get_coordinates(self):
         return self.coordinates
 
     def is_valid_target(self, x, y, z):
@@ -23,9 +23,9 @@ class Vessel:
             return "Vessel is destroyed"
         elif self.weapon.munitions == 0:
             return "No more munitions"
-        elif self.calculate_distance > self.weapon.range or not self.is_valid_target(x, y, z):
+        elif self.calculate_distance(x, y, z) > self.weapon.range or not self.is_valid_target(x, y, z):
             self.weapon.munitions -= 1
-            return "Loin de vision or not valid target "
+            return "Loin de vision or not valid target"
         else:
             pass
 
