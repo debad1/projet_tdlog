@@ -27,5 +27,9 @@ class Submarine(Vessel):
             self.weapon.munitions -= 1
             return "Loin de vision or not valid target "
         else:
-            pass
-        # on doit diminuer de max_hits de vessel attaqué
+            target_vessel = self.get_target_vessel(x, y, z)
+            if target_vessel:
+                target_vessel.reduce_max_hits(1)
+            else:
+                return "Target vessel not found"
+
