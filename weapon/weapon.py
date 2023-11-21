@@ -10,13 +10,6 @@ class Weapon:
         pass
 
 
-class Lance_missiles_antisurface(Weapon):
-    pass
 
 
-class AntiAirMissile(Weapon):
-    pass
 
-
-class Lance_torpilles(Weapon):
-    pass
