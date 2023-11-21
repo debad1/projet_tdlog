@@ -6,9 +6,6 @@ class Weapon:
     def fire_at(self, x: int, y: int, z: int):
         pass
 
-    def is_valid_target(self, x, y, z):
-        pass
-
 
 
 
