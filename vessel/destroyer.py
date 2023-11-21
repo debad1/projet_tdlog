@@ -25,3 +25,6 @@ class Destroyer(Vessel):
             return f"Successful shot at the target at position ({x}, {y}, {z})"
         else:
             return "No munitions."
+
+class Me:
+    pass
