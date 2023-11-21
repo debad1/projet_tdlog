@@ -10,3 +10,4 @@ class TestFrigate(TestCase):
         aircraft = Aircraft(coordinates)
         aircraft.fire_at(2, 3, 4)
         self.assertEqual(49, aircraft.weapon.munitions)
+        print("bon")
