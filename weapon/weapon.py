@@ -5,8 +5,3 @@ class Weapon:
 
     def fire_at(self, x: int, y: int, z: int):
         pass
-
-
-
-
-
