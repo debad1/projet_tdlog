@@ -1,4 +1,4 @@
-from weapon.weapon import Weapon, AntiAirMissile, Lance_torpilles, Lance_missiles_antisurface
+from weapon.weapon import Weapon
 from math import sqrt
 
 
@@ -26,8 +26,6 @@ class Vessel:
         elif self.calculate_distance(x, y, z) > self.weapon.range or not self.is_valid_target(x, y, z):
             self.weapon.munitions -= 1
             return "Loin de vision or not valid target"
-        else:
-            pass
 
     def calculate_distance(self, x, y, z):
         x1, y1, z1 = self.coordinates
@@ -35,8 +33,8 @@ class Vessel:
 
 
 class Cruiser(Vessel):
-    def __init__(self, coordinates):
-        weapon = AntiAirMissile
+    def __init__(self, coordinates, munitions):
+        weapon = AntiAirMissile()
         super().__init__(coordinates, max_hits = 6, weapon = weapon)
 
     def go_to(self, x, y, z):
@@ -64,7 +62,7 @@ class Cruiser(Vessel):
 
 class Submarine(Vessel):
     def __init__(self, coordinates):
-        weapon = Lance_torpilles
+        weapon = Lance_torpilles()
         super().__init__(coordinates, max_hits = 2, weapon = weapon)
 
     def is_valid_move(self, x, y, z):
